@@ -1,18 +1,21 @@
 import { ethers } from "hardhat";
+import { MyToken1, Staking } from "../typechain-types";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
 
-  const lockedAmount = ethers.utils.parseEther("0.001");
+  let staking: Staking;
+  let myToken1: MyToken1;
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  const myToken1Factory = await ethers.getContractFactory("MyToken1");
+  myToken1 = (await myToken1Factory.deploy()) as MyToken1;
+  await myToken1.deployed();
 
-  await lock.deployed();
+  const stakingFactory = await ethers.getContractFactory("Staking");
+  staking = (await stakingFactory.deploy(myToken1.address, 100)) as Staking;
+  await staking.deployed();
 
   console.log(
-    `Lock with ${ethers.utils.formatEther(lockedAmount)}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
+    ` `
   );
 }
 
